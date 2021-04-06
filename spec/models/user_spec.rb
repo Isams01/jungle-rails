@@ -2,6 +2,11 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   describe 'Validations' do
+
+    before(:each) do
+      User.delete_all
+    end
+
     it 'must be created with password and password confirmation fields' do
       @user = User.new(first_name: "fname",last_name: "lname", email: "test@test.com", password: "testtttt", password_confirmation: "testtttt")
       expect(@user).to be_valid
@@ -41,6 +46,20 @@ RSpec.describe User, type: :model do
     end
   end
   describe '.authenticate_with_credentials' do
+    it 'Should return nil if no match' do
+      @user = User.new(first_name: "fname", last_name: "lname", email: "abc@test.com", password: "test", password_confirmation: "test")
+      @user.save
+      @nil_result = User.authenticate_with_credentials("t@test.com", "test")
+      expect(@nil_result).to be_nil
+    end
+    it 'Should be a user object if match' do
+      @user = User.new(first_name: "fname", last_name: "lname", email: "abc@test.com", password: "test", password_confirmation: "test")
+      @user.save
+      @result = User.authenticate_with_credentials("abc@test.com", "test")
+      expect(@result[:email]).to eq(@user[:email])
+      expect(@result[:first_name]).to eq(@user[:first_name])
+      expect(@result[:last_name]).to eq(@user[:last_name])
+    end
   end
 
 end
